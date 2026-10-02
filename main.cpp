@@ -3,6 +3,7 @@
 #include <algorithm> 
 #include <functional>
 #include <ranges>
+#include <optional>
 
 using namespace std;
 
@@ -185,8 +186,264 @@ namespace problem {
         cout << "Result: " << count << endl;
     }
 
+    //problem8
+    /* Создайте класс Laptop, у которого есть:
+        - Конструктор, принимающий 3 аргумента: бренд, модель и цену ноутбука.
+          На основании этих аргументов нужно для экземпляра создать атрибуты brand, model,
+          price и также атрибут laptop_name — строковое значение, следующего вида: «brand model»
+        - Метод laptop_name возвращающий аналогичное значение поля*/
 
+    class Laptop{
+    private:
+        string brand_;
+        string model_;
+        double price_;
+        string laptop_name_;
+    
+    public:
+        Laptop(string brand, string model, double price){
+            brand_ = brand;
+            model_ = model;
+            price_ = price;
+            laptop_name_ = brand + " " + model;
+        }
+
+        string laptop_name() const {
+            return laptop_name_;
+        }
+
+        string brand() const {
+            return brand_;
+        }
+    
+        string model() const {
+            return model_;
+        }
+    
+        double price() const {
+            return price_;
+        }
+    };
+
+    void problem8(){
+        Laptop laptop("HP", "Omen 15", 95000);
+        cout << "Laptop name: " << laptop.laptop_name() << endl;
+        cout << "brand: " << laptop.brand() << endl;
+        cout << "model: " << laptop.model() << endl;
+        cout << "price: " << laptop.price() << endl;
+    }
+
+    class Promise {
+    private:
+        unsigned id_; //СНИЛС
+        double salary_;
+        bool fulfilled_;
+
+    public:
+        Promise(unsigned id, double salary)
+            : id_(id), salary_(salary), fulfilled_(false){
+        }
+
+        unsigned id() const{
+            return id_;
+        }
+
+        double salary() const{
+            return salary_;
+        }
+
+        bool fulfilled() const {
+            return fulfilled_;
+        }
+
+        void set_fulfilled(bool value) {
+            fulfilled_ = value;
+        }
+    };
+
+    class Employee {
+    private:
+        string first_name_;
+        string second_name_;
+        unsigned id_;
+        Promise promise_;
+    public:
+        Employee(string first_name,
+                 string second_name,
+                 unsigned id,
+                 double salary)
+            : first_name_(first_name),
+            second_name_(second_name),
+            id_(id),
+            promise_(id, salary) {
+        }
+
+        string first_name() const {
+            return first_name_;
+        }
         
+        string second_name() const {
+            return second_name_;
+        }
+        
+        unsigned id() const {
+            return id_;
+        }
+
+        Promise& promise() {
+            return promise_;
+        }
+
+        const Promise& promise() const {
+            return promise_;
+        }
+    };
+
+    class Director : public Employee {
+    public:
+        Director(string first_name,
+                 string second_name,
+                 unsigned id,
+                 double salary)
+            : Employee(first_name, second_name, id, salary) {
+        }
+
+        bool check_promises() const {
+            return promise().fulfilled();
+        }
+    };
+
+    class Company {
+    private:
+        double balance_;
+        optional<Director> director_;
+        vector<Employee> employees_;
+    public:
+        Company(double balance)
+            : balance_(balance){
+        }
+
+        void create_director(
+            string first_name,
+            string second_name,
+            unsigned id,
+            double salary
+        ) {
+            director_.emplace(first_name, second_name, id, salary);
+        }
+
+        void create_employee(
+            string first_name,
+            string second_name,
+            unsigned id,
+            double salary
+        ) {
+            employees_.emplace_back(first_name, second_name, id, salary);
+        }
+
+        void set_profit(double profit) {
+            balance_ += profit;
+        }
+
+        double balance() const {
+            return balance_;
+        }
+
+        bool fulfill_promise() {
+            double total_salary = 0.0;
+
+            if (director_) {
+                total_salary += director_->promise().salary();
+            }
+            ranges::for_each(employees_, [&](const Employee& employee) {
+                total_salary += employee.promise().salary();
+            });
+
+            bool can_pay = balance_ >= total_salary;
+            if (director_) {
+                director_->promise().set_fulfilled(can_pay);
+            }
+            ranges::for_each(employees_, [&](Employee& employee) {
+                employee.promise().set_fulfilled(can_pay);
+            });
+
+            if (can_pay) {
+                balance_ -= total_salary;
+            }
+            return can_pay;
+        }
+
+        Director& director() {
+            return director_.value();
+        }
+        
+        const Director& director() const {
+            return director_.value();
+        }
+
+        void print_info() const {
+            cout << "Balance: " << balance_ << endl;
+        
+            if (director_) {
+                cout << "Director: "
+                     << director_->first_name() << " "
+                     << director_->second_name() << endl;
+        
+                cout << "Salary: "
+                     << director_->promise().salary() << endl;
+        
+                cout << "Promise: "
+                     << boolalpha
+                     << director_->promise().fulfilled() << endl;
+            }
+        
+            cout << "Employees:" << endl;
+        
+            for (const auto& employee : employees_) {
+                cout << employee.first_name() << " "
+                     << employee.second_name()
+                     << ", salary: "
+                     << employee.promise().salary()
+                     << ", promise: "
+                     << boolalpha
+                     << employee.promise().fulfilled()
+                     << endl;
+            }
+        }
+    };
+
+    void problem9(){
+        Company vk(50);
+
+        vk.create_director("Gubka", "Bob", 1, 15);
+    
+        vk.create_employee("Patric", "Star", 2, 8);
+        vk.create_employee("Scvidvard", "Shupalca", 3, 6);
+    
+        cout << "Before payment:" << endl;
+        vk.print_info();
+    
+        vk.set_profit(150.25);
+    
+        cout << endl;
+        cout << "After profit:" << endl;
+        cout << "Fulfill promise: "
+             << boolalpha
+             << vk.fulfill_promise() << endl;
+    
+        vk.print_info();
+    
+        vk.set_profit(-300);
+    
+        cout << endl;
+        cout << "After loss:" << endl;
+        cout << "Fulfill promise: "
+             << boolalpha
+             << vk.fulfill_promise() << endl;
+    
+        vk.print_info();
+
+    }  
 }
 
 using namespace problem;
@@ -217,6 +474,12 @@ int main() {
             break;
         case 7:
             problem7();
+            break;
+        case 8:
+            problem8();
+            break;
+        case 9:
+            problem9();
             break;
         default:
             cout << "Invalid problem number" << endl;
