@@ -72,7 +72,35 @@ namespace problem {
         Найти среднее арифметическое всех чисел кратных 3. 
         Если таких чисел нет, то вывести -1*/
 
+        unsigned N;
+        cout << "Enter one digit (the count of next digits): ";
+        cin >> N;
 
+        vector<int> numbers(N);
+
+        ranges::for_each(numbers, [](int& number){
+            cin >> number;
+        });
+
+        auto multiples_of_three = numbers
+            | views::filter([](int number){
+                return number % 3 == 0;
+            });
+
+        auto sum = ranges::fold_left(
+            multiples_of_three,
+            0,
+            plus{}
+        );
+
+        auto count = ranges::distance(multiples_of_three);
+
+        if (count == 0) {
+            cout << "Result: -1" << endl;
+            return;
+        }
+        auto result = static_cast<double>(sum) / count;
+        cout << "Result: " << result << endl;
     }
         
 }
