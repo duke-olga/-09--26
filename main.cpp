@@ -102,6 +102,36 @@ namespace problem {
         auto result = static_cast<double>(sum) / count;
         cout << "Result: " << result << endl;
     }
+
+    void problem4(){
+        /*Дано натуральное число A > 1.
+        Определите, каким по счету числом Фибоначчи оно является,
+        то есть выведите такое число n, что φ_n = A .
+        Если А не является числом Фибоначчи, выведите число -1*/
+
+        unsigned a;
+        cout << "Enter a number: ";
+        cin >> a;
+
+        unsigned prev = 1;
+        unsigned curr = 1;
+        unsigned index = 2;
+
+        auto next_fibonacci = [&](){
+            auto next = prev + curr;
+            prev = curr;
+            curr = next;
+            ++index;
+        };
+
+        while (curr < a){
+            next_fibonacci();
+        };
+        auto result = curr == a ? static_cast<int>(index) : -1;
+        cout << "Result: " << result << endl;
+    }
+
+
         
 }
 
@@ -121,6 +151,9 @@ int main() {
             break;
         case 3:
             problem3();
+            break;
+        case 4:
+            problem4();
             break;
         default:
             cout << "Invalid problem number" << endl;
