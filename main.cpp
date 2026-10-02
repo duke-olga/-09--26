@@ -143,11 +143,47 @@ namespace problem {
             cout << power << " ";
             power *= 2;
         }
-
-
-
     }
 
+    void problem6(){
+        /* Сначала на вход поступает длина последовательности N.
+        Затем элементы последовательности – целые числа.
+        Подсчитать кол-во положительных чисел среди элементов последовательности.*/
+        unsigned N;
+        cout << "Enter one digit (the count of next digits): ";
+        cin >> N;
+
+        vector<int> numbers(N);
+
+        ranges::for_each(numbers, [](int& number){
+            cin >> number;
+        });
+
+        auto result = ranges::count_if(numbers, [](int number){
+            return number > 0;
+        });
+        cout << "Result: " << result << endl;
+    }
+
+    void problem7(){
+        /* Последовательность состоит из натуральных чисел и завершается числом 0.
+        Определите кол-во элементов последовательности, которые равны ее наибольшему элементу.*/
+        unsigned num;
+        unsigned max_num = 0;
+        unsigned count = 0;
+        
+        cout << "Enter numbers (to finish entering, enter 0): ";
+        while (cin >> num && num != 0){
+            if (num > max_num){
+                max_num = num;
+                count = 1;
+            }
+            else if (num == max_num){
+                ++count;
+            }
+        }
+        cout << "Result: " << count << endl;
+    }
 
 
         
@@ -175,6 +211,12 @@ int main() {
             break;
         case 5:
             problem5();
+            break;
+        case 6:
+            problem6();
+            break;
+        case 7:
+            problem7();
             break;
         default:
             cout << "Invalid problem number" << endl;
