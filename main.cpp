@@ -131,6 +131,24 @@ namespace problem {
         cout << "Result: " << result << endl;
     }
 
+    void problem5(){
+        /* По данному числу N распечатайте все целые значения
+        степени двойки, не превосходящие N, в порядке возрастания.*/
+        unsigned n;
+        cout << "Enter a number: ";
+        cin >> n;
+
+        unsigned power = 1;
+        while (power <= n){
+            cout << power << " ";
+            power *= 2;
+        }
+
+
+
+    }
+
+
 
         
 }
@@ -154,6 +172,9 @@ int main() {
             break;
         case 4:
             problem4();
+            break;
+        case 5:
+            problem5();
             break;
         default:
             cout << "Invalid problem number" << endl;
